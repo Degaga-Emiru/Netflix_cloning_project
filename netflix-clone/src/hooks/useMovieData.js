@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const API_KEY = 'ff1bd559990b4ad401f6dd1b82675051'; // Get from https://www.themoviedb.org/
+const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
 
 export const useMovieData = () => {
   const [movies, setMovies] = useState({
@@ -31,6 +31,17 @@ export const useMovieData = () => {
         ];
 
         const [
+          { data: { results: netflixOriginals } },
+          { data: { results: trendingNow } },
+          { data: { results: topRated } },
+          { data: { results: actionMovies } },
+          { data: { results: comedyMovies } },
+          { data: { results: horrorMovies } },
+          { data: { results: romanceMovies } },
+          { data: { results: documentaries } },
+        ] = await Promise.all(requests);
+
+        setMovies({
           netflixOriginals,
           trendingNow,
           topRated,
@@ -39,17 +50,6 @@ export const useMovieData = () => {
           horrorMovies,
           romanceMovies,
           documentaries,
-        ] = await Promise.all(requests);
-
-        setMovies({
-          netflixOriginals: netflixOriginals.data.results,
-          trendingNow: trendingNow.data.results,
-          topRated: topRated.data.results,
-          actionMovies: actionMovies.data.results,
-          comedyMovies: comedyMovies.data.results,
-          horrorMovies: horrorMovies.data.results,
-          romanceMovies: romanceMovies.data.results,
-          documentaries: documentaries.data.results,
         });
         setLoading(false);
       } catch (error) {

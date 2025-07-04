@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
+import FAQ from '../components/landing/FAQ';
+import ReasonsToJoin from '../components/landing/ReasonsToJoin';
+import Footer from '../components/landing/Footer';
 export default function Landing() {
   const [email, setEmail] = useState('');
   const navigate = useNavigate();
@@ -44,6 +46,9 @@ export default function Landing() {
           </button>
         </div>
       </div>
+       <ReasonsToJoin />
+            <FAQ />
+            <Footer />
     </div>
   );
 }

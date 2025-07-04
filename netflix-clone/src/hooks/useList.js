@@ -1,25 +1,30 @@
 import { useState, useEffect } from 'react';
 
-export function useList() {
+export const useList = () => {
   const [list, setList] = useState([]);
 
+  // Load list from localStorage on initial render
   useEffect(() => {
-    const storedList = localStorage.getItem('netflixMyList');
-    if (storedList) {
-      setList(JSON.parse(storedList));
+    const savedList = localStorage.getItem('netflixMyList');
+    if (savedList) {
+      setList(JSON.parse(savedList));
     }
   }, []);
 
+  // Save list to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('netflixMyList', JSON.stringify(list));
+  }, [list]);
+
   const addToList = (item) => {
-    const newList = [...list, item];
-    setList(newList);
-    localStorage.setItem('netflixMyList', JSON.stringify(newList));
+    // Check if item already exists in list
+    if (!list.some(listItem => listItem.id === item.id)) {
+      setList([...list, item]);
+    }
   };
 
   const removeFromList = (itemId) => {
-    const newList = list.filter(item => item.id !== itemId);
-    setList(newList);
-    localStorage.setItem('netflixMyList', JSON.stringify(newList));
+    setList(list.filter(item => item.id !== itemId));
   };
 
   const isInList = (itemId) => {
@@ -27,4 +32,4 @@ export function useList() {
   };
 
   return { list, addToList, removeFromList, isInList };
-}
+};

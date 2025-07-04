@@ -1,45 +1,73 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useState, useContext, useEffect } from 'react';
 
+// 1. Create the context
 const AuthContext = createContext();
 
-export function AuthProvider({ children }) {
+// 2. Create the provider component
+export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  
 
   useEffect(() => {
-    // Check localStorage for user on initial load
     const storedUser = localStorage.getItem('netflixUser');
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
+    if (storedUser) setUser(JSON.parse(storedUser));
     setLoading(false);
   }, []);
 
-  const signUp = (email) => {
-    const newUser = { email, plan: 'basic' };
-    localStorage.setItem('netflixUser', JSON.stringify(newUser));
-    setUser(newUser);
+  const login = async (email, password) => {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        if (email && password) {
+          const userData = {
+            email,
+            name: email.split('@')[0],
+            avatar: `https://ui-avatars.com/api/?name=${email.split('@')[0]}`,
+          };
+          setUser(userData);
+          localStorage.setItem('netflixUser', JSON.stringify(userData));
+          resolve(userData);
+        } else {
+          reject(new Error('Email and password are required'));
+        }
+      }, 1000);
+    });
   };
 
-  const login = (email) => {
-    const storedUser = JSON.parse(localStorage.getItem('netflixUser'));
-    if (storedUser && storedUser.email === email) {
-      setUser(storedUser);
-      return true;
-    }
-    return false;
+  const signup = async (email, password, name) => {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        if (email && password && name) {
+          const userData = {
+            email,
+            name,
+            avatar: `https://ui-avatars.com/api/?name=${name}`,
+          };
+          setUser(userData);
+          localStorage.setItem('netflixUser', JSON.stringify(userData));
+          resolve(userData);
+        } else {
+          reject(new Error('All fields are required'));
+        }
+      }, 1000);
+    });
   };
 
   const logout = () => {
-    localStorage.removeItem('netflixUser');
     setUser(null);
+    localStorage.removeItem('netflixUser');
+    
   };
 
   return (
-    <AuthContext.Provider value={{ user, signUp, login, logout, loading }}>
-      {children}
+    <AuthContext.Provider value={{ user, loading, login, signup, logout }}>
+      {!loading && children}
     </AuthContext.Provider>
   );
-}
+};
 
+// 3. Export the custom hook (recommended usage)
 export const useAuth = () => useContext(AuthContext);
+
+// 4. Export the context directly (if needed elsewhere)
+export { AuthContext };
